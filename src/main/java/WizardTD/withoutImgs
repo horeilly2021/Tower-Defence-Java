@@ -1,0 +1,46 @@
++ CELLSIZE: int = 32
++ SIDEBAR: int = 120
++ TOPBAR: int = 40
++ BOARD_WIDTH: int = 20
++ HALF_CELL: int = 16
++ WIDTH: int
++ HEIGHT: int
++ BARWIDTH: int = 256
++ BARHEIGHT: int = 16
++ FPS: int = 60
++ THICK: int = 2
++ THIN: int = 1
++ BLACK: int = 0
++ configPath: String
++ level: String
++ json: JSONObject
++ waves: WaveDisplay
++ screen: Screen
++ worm: PImage
++ buttonManager: ButtonManager
++ buttons: ArrayList<MyButton>
++ timer: int
++ paused: boolean
++ fast: boolean
++ towerManager: TowerManager
++ selectedTower: Tower
++ mana: Mana
++ fireballManager: FireballManager
++ App()
++ settings(): void
++ loadImgs(): void
++ setup(): void
++ keyPressed(): void
++ setSelectedTower(Tower): void
++ drawSelectedTower(): void
++ mousePressed(MouseEvent): void
++ mouseClicked(MouseEvent): void
++ mouseMoved(MouseEvent): void
++ towerDesc(MyButton, String): void
++ shootMonster(Tower, Monster): void
++ attackEnemy(ArrayList<Monster>, ArrayList<Tower>): void
++ collectMana(): void
++ loseMana(): void
++ draw(): void
++ drawMana(): void
++ main(String[]): void

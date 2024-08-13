@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">JSONInfo.java</span></div><h1>JSONInfo.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.data.JSONArray;
+import processing.data.JSONObject;
+
+public class JSONInfo {
+
+    private int index;
+    private JSONObject json;
+    private JSONArray waves;
+    private JSONObject currentWave;
+    private JSONArray monsterInfo;
+    private JSONObject currentMonsterInfo;
+
+    private int waveAmount;
+
+    private int quantity;
+    private int hp;
+    private int mana;
+    private String type;
+    private int speed;
+    private float armour;
+    private int amount;
+    private int towerRange;
+
+<span class="nc" id="L26">    public JSONInfo(JSONObject json, int index) {</span>
+<span class="nc" id="L27">        this.json = json;</span>
+<span class="nc" id="L28">        this.index = index;</span>
+
+<span class="nc" id="L30">        this.waves = getWaves();</span>
+<span class="nc" id="L31">        setCurrentWave(this.index);</span>
+<span class="nc" id="L32">        this.currentWave = getCurrentWave();</span>
+<span class="nc" id="L33">        this.currentMonsterInfo = getCurrentMonsterInfo();</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * Get the index of the current wave.
+     *
+     * @return The index of the current wave.
+     */
+    public int getIndex() {
+<span class="nc" id="L42">        return this.index;</span>
+    }
+
+    /**
+     * Get the JSON array containing all waves.
+     *
+     * @return A JSONArray representing the waves.
+     */
+    public JSONArray getWaves() {
+<span class="nc" id="L51">        this.waves = (JSONArray) this.json.get(&quot;waves&quot;);</span>
+<span class="nc" id="L52">        return this.waves;</span>
+    }
+
+    /**
+     * Get the total number of waves in the level.
+     *
+     * @return The total number of waves.
+     */
+    public int getWaveAmount() {
+<span class="nc" id="L61">        return this.waves.size();</span>
+    }
+
+    /**
+     * Set the current wave by its index.
+     *
+     * @param index The index of the wave to set as the current wave.
+     */
+    public void setCurrentWave(int index) {
+<span class="nc" id="L70">        this.currentWave = (JSONObject) this.waves.get(index);</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * Get the JSON object representing the current wave.
+     *
+     * @return A JSONObject representing the current wave.
+     */
+    public JSONObject getCurrentWave() {
+<span class="nc" id="L79">        return this.currentWave;</span>
+    }
+
+    /**
+     * Get the JSON array containing monster information for the current wave.
+     *
+     * @return A JSONArray containing monster information for the current wave.
+     */
+    public JSONArray getMonsterInfo() {
+<span class="nc" id="L88">        return this.monsterInfo = (JSONArray) this.currentWave.get(&quot;monsters&quot;);</span>
+    }
+
+    /**
+     * Get the JSON object representing information about the first monster in the current wave.
+     *
+     * @return A JSONObject representing the information of the first monster in the current wave.
+     */
+    public JSONObject getCurrentMonsterInfo() {
+<span class="nc" id="L97">        return this.currentMonsterInfo = (JSONObject) this.getMonsterInfo().get(0);</span>
+    }
+
+    /**
+     * Get the duration of the current wave.
+     *
+     * @return The duration of the current wave.
+     */
+    public int getWaveDuration() {
+<span class="nc" id="L106">        return this.amount = (int) this.currentWave.get(&quot;duration&quot;);</span>
+    }
+
+    /**
+     * Get the pause time before the current wave.
+     *
+     * @return The pause time before the current wave.
+     */
+    public double getPauseTime() {
+<span class="nc" id="L115">        Object preWavePauseObj = this.currentWave.get(&quot;pre_wave_pause&quot;);</span>
+
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (preWavePauseObj instanceof Double) {</span>
+<span class="nc" id="L118">            return (Double) preWavePauseObj;</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        } else if (preWavePauseObj instanceof Integer) {</span>
+<span class="nc" id="L120">            return ((Integer) preWavePauseObj).doubleValue();</span>
+        } else {
+<span class="nc" id="L122">            return 0.0;</span>
+        }
+    }
+
+    /**
+     * Move to the next wave.
+     */
+    public void nextWave() {
+<span class="nc" id="L130">        this.index = this.index + 1;</span>
+<span class="nc" id="L131">    }</span>
+
+    /**
+     * Get the quantity of the first monster in the current wave.
+     *
+     * @return The quantity of the first monster in the current wave.
+     */
+    public int getQuantity() {
+<span class="nc" id="L139">        return this.currentMonsterInfo.getInt(&quot;quantity&quot;);</span>
+    }
+
+    /**
+     * Get the hit points (HP) of the first monster in the current wave.
+     *
+     * @return The hit points (HP) of the first monster in the current wave.
+     */
+    public int getHp() {
+<span class="nc" id="L148">        return this.currentMonsterInfo.getInt(&quot;hp&quot;);</span>
+    }
+
+    /**
+     * Get the mana gained on kill for the first monster in the current wave.
+     *
+     * @return The mana gained on kill for the first monster in the current wave.
+     */
+    public int getMana() {
+<span class="nc" id="L157">        return this.currentMonsterInfo.getInt(&quot;mana_gained_on_kill&quot;);</span>
+    }
+
+    /**
+     * Get the type of the first monster in the current wave.
+     *
+     * @return The type of the first monster in the current wave.
+     */
+    public String getType() {
+<span class="nc" id="L166">        return this.type = this.currentMonsterInfo.getString(&quot;type&quot;);</span>
+    }
+
+    /**
+     * Get the speed of the first monster in the current wave.
+     *
+     * @return The speed of the first monster in the current wave.
+     */
+    public int getSpeed() {
+<span class="nc" id="L175">        return this.speed = this.currentMonsterInfo.getInt(&quot;speed&quot;);</span>
+    }
+
+    /**
+     * Get the armor value of the first monster in the current wave.
+     *
+     * @return The armor value of the first monster in the current wave.
+     */
+    public float getArmour() {
+<span class="nc" id="L184">        return this.armour = this.currentMonsterInfo.getFloat(&quot;armour&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

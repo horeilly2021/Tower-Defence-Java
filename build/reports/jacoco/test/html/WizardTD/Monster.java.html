@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Monster.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">Monster.java</span></div><h1>Monster.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.data.JSONObject;
+
+import java.util.*;
+
+public class Monster {
+
+    public static final int HEIGHT = 2;
+    private PApplet parent;
+    private PImage sprite;
+    private float x, y;
+    private float startX, startY;
+    private float velX, velY;
+    private char[][] cords;
+    private LinkedList&lt;int[]&gt; pathToHouse;
+    private float health;
+    private boolean alive;
+    private int currentPosition;
+    private boolean killed;
+    private boolean dying;
+    private boolean reached;
+<span class="nc" id="L25">    static int[] dx = {-1, 1, 0, 0};</span>
+<span class="nc" id="L26">    static int[] dy = {0, 0, -1, 1};</span>
+    private int deathHealth;
+    private float healthBarWidth;
+    private float percentageHealth;
+    private JSONInfo jsonInfo;
+    private double movingTimer;
+    private float initialHp;
+    private float speed;
+    private int manaGainedOnKill;
+    private Mana mana;
+    private boolean collectedMana;
+
+<span class="nc" id="L38">    public Monster(PApplet parent, PImage sprite, float x, float y, JSONObject json, int index) {</span>
+<span class="nc" id="L39">        this.sprite = sprite;</span>
+<span class="nc" id="L40">        this.currentPosition = 0;</span>
+<span class="nc" id="L41">        this.parent = parent;</span>
+
+<span class="nc" id="L43">        this.x = x;</span>
+<span class="nc" id="L44">        this.y = y;</span>
+<span class="nc" id="L45">        this.startX = x;</span>
+<span class="nc" id="L46">        this.startY = y;</span>
+<span class="nc" id="L47">        this.velX = 0;</span>
+<span class="nc" id="L48">        this.velY = 0;</span>
+
+<span class="nc" id="L50">        this.alive = true;</span>
+<span class="nc" id="L51">        this.killed = false;</span>
+<span class="nc" id="L52">        this.dying = false;</span>
+<span class="nc" id="L53">        this.reached = false;</span>
+<span class="nc" id="L54">        this.collectedMana = false;</span>
+
+<span class="nc" id="L56">        this.cords = EdgePointsFinder.getDetails(json.getString(&quot;layout&quot;));</span>
+<span class="nc" id="L57">        this.pathToHouse = bfs(cords);</span>
+
+<span class="nc" id="L59">        this.jsonInfo = new JSONInfo(json, index);</span>
+<span class="nc" id="L60">        this.initialHp = this.jsonInfo.getHp() * (1 + jsonInfo.getArmour());</span>
+<span class="nc" id="L61">        this.health = this.initialHp;</span>
+<span class="nc" id="L62">        this.deathHealth = 0;</span>
+<span class="nc" id="L63">        this.speed = this.jsonInfo.getSpeed();</span>
+
+<span class="nc" id="L65">        this.manaGainedOnKill = this.jsonInfo.getMana();</span>
+<span class="nc" id="L66">        this.mana = new Mana(this.parent);</span>
+
+<span class="nc" id="L68">        this.movingTimer = 1;</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Retrieves the current x-coordinate of the object.
+     *
+     * @return The current x-coordinate as a float.
+     */
+    public float getCurX() {
+<span class="nc" id="L77">        return this.x;</span>
+    }
+
+    /**
+     * Retrieves the current y-coordinate of the object.
+     *
+     * @return The current y-coordinate as a float.
+     */
+    public float getCurY() {
+<span class="nc" id="L86">        return this.y;</span>
+    }
+
+    /**
+     * Calculates and retrieves the current width of the health bar.
+     *
+     * @return The width of the health bar as a float.
+     */
+    public float getHealthBarWidth() {
+<span class="nc" id="L95">        return this.healthBarWidth = PApplet.map(this.health, 0, this.initialHp, 0, this.initialHp);</span>
+    }
+
+    /**
+     * Calculates and retrieves the percentage of health remaining based on the health bar width.
+     *
+     * @return The percentage of health remaining as a float.
+     */
+    public float getPercentageHealth() {
+<span class="nc" id="L104">        return this.percentageHealth = (1 - getHealthBarWidth() / this.initialHp) * App.BOARD_WIDTH;</span>
+    }
+
+    /**
+     * Reduces the moving timer by one.
+     */
+    public void reduceMovingTimer() {
+<span class="nc" id="L111">        this.movingTimer--;</span>
+<span class="nc" id="L112">    }</span>
+
+    /**
+     * Sets the moving timer to the specified time.
+     *
+     * @param time The new value for the moving timer.
+     */
+    public void setMovingTimer(double time) {
+<span class="nc" id="L120">        this.movingTimer = time;</span>
+<span class="nc" id="L121">    }</span>
+
+    /**
+     * Retrieves the current value of the moving timer.
+     *
+     * @return The current moving timer value as a double.
+     */
+    public double getMovingTimer() {
+<span class="nc" id="L129">        return this.movingTimer;</span>
+    }
+
+    /**
+     * Calculates and sets the initial moving timer value based on the object's speed.
+     *
+     * @return The initial moving timer value as a double.
+     */
+    public double startingMovingTimer() {
+<span class="nc" id="L138">        return this.movingTimer = (double) App.CELLSIZE / this.jsonInfo.getSpeed();</span>
+    }
+
+    /**
+     * Inflicts damage on the object and updates its state if its health reaches zero.
+     *
+     * @param damage The amount of damage to inflict.
+     */
+    public void damage(int damage) {
+<span class="nc" id="L147">        this.health -= damage;</span>
+<span class="nc bnc" id="L148" title="All 4 branches missed.">        if (this.health &lt;= 0 &amp;&amp; !this.reached) {</span>
+<span class="nc" id="L149">            this.mana.increaseMana(this.manaGainedOnKill);</span>
+<span class="nc" id="L150">            this.alive = false;</span>
+<span class="nc" id="L151">            this.dying = true;</span>
+        }
+<span class="nc" id="L153">    }</span>
+
+    /**
+     * Checks whether the object is alive.
+     *
+     * @return `true` if the object is alive, `false` otherwise.
+     */
+    public boolean isAlive() {
+<span class="nc" id="L161">        return this.alive;</span>
+    }
+
+    /**
+     * Advances the object's current position.
+     */
+    public void movePosition() {
+<span class="nc" id="L168">        this.currentPosition++;</span>
+<span class="nc" id="L169">    }</span>
+
+    /**
+     * Retrieves the current position of the object.
+     *
+     * @return The current position as an integer.
+     */
+    public int getCurrentPosition() {
+<span class="nc" id="L177">        return this.currentPosition;</span>
+    }
+
+    /**
+     * Retrieves the x-coordinate of a specified position in the path.
+     *
+     * @param posX The position in the path.
+     * @return The x-coordinate at the specified position.
+     */
+    public float getX(int posX) {
+<span class="nc" id="L187">        return this.pathToHouse.get(posX)[0];</span>
+    }
+
+    /**
+     * Retrieves the y-coordinate of a specified position in the path.
+     *
+     * @param posY The position in the path.
+     * @return The y-coordinate at the specified position.
+     */
+    public float getY(int posY) {
+<span class="nc" id="L197">        return this.pathToHouse.get(posY)[1];</span>
+    }
+
+    /**
+     * Retrieves the x-coordinate of the next position in the path.
+     *
+     * @param posX The current position in the path.
+     * @return The x-coordinate of the next position.
+     */
+    public float getNextX(int posX) {
+<span class="nc" id="L207">        return this.pathToHouse.get(posX + 1)[0];</span>
+    }
+
+    /**
+     * Retrieves the y-coordinate of the next position in the path.
+     *
+     * @param posY The current position in the path.
+     * @return The y-coordinate of the next position.
+     */
+    public float getNextY(int posY) {
+<span class="nc" id="L217">        return this.pathToHouse.get(posY + 1)[1];</span>
+    }
+
+    /**
+     * Sets the &quot;reached&quot; state of the object, indicating whether it has reached its destination.
+     *
+     * @param reached The new &quot;reached&quot; state (true or false).
+     */
+    public void setReached(boolean reached) {
+<span class="nc" id="L226">        this.reached = reached;</span>
+<span class="nc" id="L227">    }</span>
+
+    /**
+     * Retrieves the sprite image associated with the object.
+     *
+     * @return The sprite image as a PImage.
+     */
+    public PImage getSprite() {
+<span class="nc" id="L235">        return this.sprite;</span>
+    }
+
+    /**
+     * Checks whether the object has been killed.
+     *
+     * @return `true` if the object has been killed, `false` otherwise.
+     */
+    public boolean isKilled() {
+<span class="nc" id="L244">        return this.killed;</span>
+    }
+
+    /**
+     * Retrieves the amount of mana gained when the object is killed.
+     *
+     * @return The mana gained on kill as an integer.
+     */
+    public int getManaGainedOnKill() {
+<span class="nc" id="L253">        return this.manaGainedOnKill;</span>
+    }
+
+    /**
+     * Sets the &quot;collectedMana&quot; state of the object, indicating whether it has collected mana.
+     *
+     * @param collectedMana The new &quot;collectedMana&quot; state (true or false).
+     */
+    public void setCollectedMana(boolean collectedMana) {
+<span class="nc" id="L262">        this.collectedMana = collectedMana;</span>
+<span class="nc" id="L263">    }</span>
+
+    /**
+     * Checks whether the object has collected mana.
+     *
+     * @return `true` if the object has collected mana, `false` otherwise.
+     */
+    public boolean hasCollectedMana() {
+<span class="nc" id="L271">        return this.collectedMana;</span>
+    }
+
+    /**
+     * Checks whether the object has reached its destination.
+     *
+     * @return `true` if the object has reached its destination, `false` otherwise.
+     */
+    public boolean hasReached() {
+<span class="nc" id="L280">        return this.reached;</span>
+    }
+
+    /**
+     * Moves the object to the specified position in the path.
+     *
+     * @param pos The position in the path to move to.
+     */
+    public void move(int pos) {
+
+<span class="nc" id="L290">        float curX = 0;</span>
+<span class="nc" id="L291">        float curY = 0;</span>
+        try {
+<span class="nc" id="L293">            curX = this.getX(pos);</span>
+<span class="nc" id="L294">            curY = this.getY(pos);</span>
+<span class="nc" id="L295">        } catch (IndexOutOfBoundsException e) {</span>
+<span class="nc" id="L296">            this.alive = false;</span>
+<span class="nc" id="L297">        }</span>
+
+        float nextX;
+        float nextY;
+        try {
+<span class="nc" id="L302">            nextX = this.getNextX(pos);</span>
+<span class="nc" id="L303">            nextY = this.getNextY(pos);</span>
+
+<span class="nc" id="L305">            this.velY = nextX - curX;</span>
+<span class="nc" id="L306">            this.velX = nextY - curY;</span>
+
+<span class="nc" id="L308">        } catch (IndexOutOfBoundsException e) {</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">            if (!this.reached) {</span>
+<span class="nc" id="L310">                this.mana.decreaseMana(this.manaGainedOnKill);</span>
+            }
+<span class="nc" id="L312">            setReached(true);</span>
+<span class="nc" id="L313">        }</span>
+
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (!this.alive) {</span>
+<span class="nc" id="L316">            this.velX = 0; this.velY = 0;</span>
+        }
+
+<span class="nc bnc" id="L319" title="All 2 branches missed.">        if (App.fast) {</span>
+<span class="nc" id="L320">            this.x += this.velX * (this.speed * 2);</span>
+<span class="nc" id="L321">            this.y += this.velY * (this.speed * 2);</span>
+        } else {
+<span class="nc" id="L323">            this.x += this.velX * this.speed;</span>
+<span class="nc" id="L324">            this.y += this.velY * this.speed;</span>
+        }
+<span class="nc" id="L326">    }</span>
+
+    /**
+     * Draws the object, including its health bar and sprite image.
+     *
+     * @param parent The PApplet object to use for drawing.
+     */
+    public void draw(PApplet parent) {
+<span class="nc" id="L334">        float x = this.x + ( (float) App.BOARD_WIDTH / 5);</span>
+<span class="nc" id="L335">        float y = this.y + ( (float) App.BOARD_WIDTH / 5);</span>
+
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (this.alive) {</span>
+<span class="nc" id="L338">            parent.strokeWeight(0);</span>
+<span class="nc" id="L339">            parent.fill(0, 255, 0);</span>
+<span class="nc" id="L340">            parent.rect(x, y - 5, App.BOARD_WIDTH, HEIGHT);</span>
+
+<span class="nc" id="L342">            parent.fill(255, 0, 0);</span>
+<span class="nc" id="L343">            parent.rect(x, y - 5, getPercentageHealth(), HEIGHT);</span>
+<span class="nc" id="L344">            parent.strokeWeight(1);</span>
+
+<span class="nc" id="L346">            parent.image(this.sprite, x, y);</span>
+        }
+
+<span class="nc bnc" id="L349" title="All 4 branches missed.">        if (this.dying &amp;&amp; !this.killed) {</span>
+<span class="nc" id="L350">            this.deathScene();</span>
+<span class="nc" id="L351">            parent.image(this.sprite, x, y);</span>
+        }
+<span class="nc" id="L353">    }</span>
+
+    /**
+     * Animates the death scene of the monster at 4 fps.
+     */
+    public void deathScene() {
+<span class="nc bnc" id="L359" title="All 2 branches missed.">        if (!this.reached) {</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">            if (this.deathHealth == 0) {</span>
+<span class="nc" id="L361">                this.sprite = App.gremlin1;</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">            } else if (this.deathHealth == 4) {</span>
+<span class="nc" id="L363">                this.sprite = App.gremlin2;</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">            } else if (this.deathHealth == 8) {</span>
+<span class="nc" id="L365">                this.sprite = App.gremlin3;</span>
+<span class="nc bnc" id="L366" title="All 2 branches missed.">            } else if (this.deathHealth == 12) {</span>
+<span class="nc" id="L367">                this.sprite = App.gremlin4;</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">            } else if (this.deathHealth == 16) {</span>
+<span class="nc" id="L369">                this.sprite = App.gremlin5;</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">            } else if (this.deathHealth &gt;= 20) {</span>
+<span class="nc" id="L371">                this.killed = true;</span>
+<span class="nc" id="L372">                this.dying = false;</span>
+            }
+<span class="nc" id="L374">            this.deathHealth++;</span>
+        }
+<span class="nc" id="L376">    }</span>
+
+    /**
+     * Performs a breadth-first search to find a path to the destination house.
+     *
+     * @param grid A 2D grid representing the game map.
+     * @return A linked list of coordinates representing the path to the destination house.
+     */
+    public LinkedList&lt;int[]&gt; bfs(char[][] grid) {
+<span class="nc" id="L385">        int numRows = grid.length;</span>
+<span class="nc" id="L386">        int numCols = grid[0].length;</span>
+
+<span class="nc" id="L388">        LinkedList&lt;int[]&gt; pathToHouse = new LinkedList&lt;&gt;();</span>
+
+<span class="nc" id="L390">        boolean[][] visited = new boolean[numRows][numCols];</span>
+
+<span class="nc" id="L392">        Queue&lt;int[]&gt; queue = new LinkedList&lt;&gt;();</span>
+
+<span class="nc" id="L394">        int[][][] parent = new int[numRows][numCols][2];</span>
+
+<span class="nc" id="L396">        int startY = (int) this.startX / App.CELLSIZE;</span>
+<span class="nc" id="L397">        int startX = (int) this.startY / App.CELLSIZE;</span>
+
+<span class="nc" id="L399">        queue.offer(new int[]{startX, startY});</span>
+<span class="nc" id="L400">        visited[startX][startY] = true;</span>
+
+<span class="nc bnc" id="L402" title="All 2 branches missed.">        while (!queue.isEmpty()) {</span>
+<span class="nc" id="L403">            int[] current = queue.poll();</span>
+<span class="nc" id="L404">            int x = current[0];</span>
+<span class="nc" id="L405">            int y = current[1];</span>
+
+<span class="nc bnc" id="L407" title="All 2 branches missed.">            if (grid[x][y] == 'W') {</span>
+<span class="nc" id="L408">                int curX = x, curY = y;</span>
+<span class="nc" id="L409">                int index = 0;</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">                while (grid[curX][curY] != 'S') {</span>
+<span class="nc" id="L411">                    int[] cords = new int[2];</span>
+<span class="nc" id="L412">                    int parentX = parent[curX][curY][0];</span>
+<span class="nc" id="L413">                    int parentY = parent[curX][curY][1];</span>
+<span class="nc" id="L414">                    cords[0] = curX;</span>
+<span class="nc" id="L415">                    cords[1] = curY;</span>
+<span class="nc" id="L416">                    pathToHouse.add(index, cords);</span>
+<span class="nc" id="L417">                    curX = parentX;</span>
+<span class="nc" id="L418">                    curY = parentY;</span>
+<span class="nc" id="L419">                    index++;</span>
+<span class="nc" id="L420">                }</span>
+<span class="nc" id="L421">                return reversed(pathToHouse);</span>
+            }
+
+<span class="nc bnc" id="L424" title="All 2 branches missed.">            for (int i = 0; i &lt; 4; i++) {</span>
+<span class="nc" id="L425">                int newX = x + dx[i];</span>
+<span class="nc" id="L426">                int newY = y + dy[i];</span>
+
+<span class="nc bnc" id="L428" title="All 14 branches missed.">                if (newX &gt;= 0 &amp;&amp; newX &lt; numRows &amp;&amp; newY &gt;= 0 &amp;&amp; newY &lt; numCols &amp;&amp; !visited[newX][newY] &amp;&amp; grid[newX][newY] != 'S' &amp;&amp; grid[newX][newY] != ' ') {</span>
+<span class="nc" id="L429">                    queue.offer(new int[]{newX, newY});</span>
+<span class="nc" id="L430">                    visited[newX][newY] = true;</span>
+<span class="nc" id="L431">                    parent[newX][newY][0] = x;</span>
+<span class="nc" id="L432">                    parent[newX][newY][1] = y;</span>
+                }
+            }
+<span class="nc" id="L435">        }</span>
+
+<span class="nc" id="L437">        return null;</span>
+    }
+
+    /**
+     * Reverses the order of a linked list of coordinates.
+     *
+     * @param ls The linked list to be reversed.
+     * @return The reversed linked list of coordinates.
+     */
+    public LinkedList&lt;int[]&gt; reversed(LinkedList&lt;int[]&gt; ls) {
+<span class="nc" id="L447">        LinkedList&lt;int[]&gt; reverse = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L448">        int j = 0;</span>
+<span class="nc bnc" id="L449" title="All 2 branches missed.">        for (int i = ls.size() - 1; i &gt; 0; i--) {</span>
+<span class="nc" id="L450">            reverse.add(j, ls.get(i));</span>
+<span class="nc" id="L451">            j++;</span>
+        }
+
+<span class="nc" id="L454">        reverse.add(0, ls.get(ls.size() - 1));</span>
+
+<span class="nc" id="L456">        return reverse;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

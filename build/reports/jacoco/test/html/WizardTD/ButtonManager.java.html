@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ButtonManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">ButtonManager.java</span></div><h1>ButtonManager.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.core.PApplet;
+
+import java.util.ArrayList;
+
+public class ButtonManager {
+
+    private ArrayList&lt;MyButton&gt; buttons;
+    private PApplet parent;
+
+<span class="nc" id="L12">    public ButtonManager(PApplet parent) {</span>
+<span class="nc" id="L13">        this.parent = parent;</span>
+<span class="nc" id="L14">        this.buttons = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L15">        addButtons();</span>
+<span class="nc" id="L16">    }</span>
+
+    /**
+     * Add a MyButton to the list of buttons.
+     *
+     * @param button The MyButton object to add.
+     */
+    public void addButton(MyButton button) {
+<span class="nc" id="L24">        this.buttons.add(button);</span>
+<span class="nc" id="L25">    }</span>
+
+    /**
+     * Get the list of MyButton objects.
+     *
+     * @return An ArrayList of MyButton objects.
+     */
+    public ArrayList&lt;MyButton&gt; getButtons() {
+<span class="nc" id="L33">        return this.buttons;</span>
+    }
+
+    /**
+     * Draw a list of buttons on the screen.
+     *
+     * @param buttons The list of buttons to draw.
+     */
+    public void drawButtons(ArrayList&lt;MyButton&gt; buttons) {
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (MyButton button : buttons) {</span>
+<span class="nc" id="L43">            button.draw();</span>
+<span class="nc" id="L44">        }</span>
+<span class="nc" id="L45">    }</span>
+
+    /**
+     * Adds side buttons to the buttons list
+     */
+    public void addButtons() {
+<span class="nc" id="L51">        this.addButton(new MyButton(this.parent, &quot;FF&quot;, &quot;2x speed&quot;, 650, 64, 50, 50, 'f'));</span>
+<span class="nc" id="L52">        this.addButton(new MyButton(this.parent, &quot;P&quot;, &quot;PAUSE&quot;, 650, 128, 50, 50, 'p'));</span>
+<span class="nc" id="L53">        this.addButton(new MyButton(this.parent, &quot;T&quot;, &quot;Build\nTower&quot;, 650, 192, 50, 50, 't'));</span>
+<span class="nc" id="L54">        this.addButton(new MyButton(this.parent, &quot;U1&quot;, &quot;Upgrade\nrange&quot;, 650, 254, 50, 50, '1'));</span>
+<span class="nc" id="L55">        this.addButton(new MyButton(this.parent, &quot;U2&quot;, &quot;Upgrade\nspeed&quot;, 650, 318, 50, 50, '2'));</span>
+<span class="nc" id="L56">        this.addButton(new MyButton(this.parent, &quot;U3&quot;, &quot;Upgrade\ndamage&quot;, 650, 382, 50, 50, '3'));</span>
+<span class="nc" id="L57">        this.addButton(new MyButton(this.parent, &quot;M&quot;, &quot;Mana\npool&quot;, 650, 446, 50, 50, 'm'));</span>
+<span class="nc" id="L58">    }</span>
+
+    /**
+     * Draw all the buttons in the list of buttons.
+     */
+    public void draw() {
+<span class="nc" id="L64">        drawButtons(this.buttons);</span>
+<span class="nc" id="L65">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

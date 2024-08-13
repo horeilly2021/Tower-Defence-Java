@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgePointsFinder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">EdgePointsFinder.java</span></div><h1>EdgePointsFinder.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+<span class="nc" id="L8">public class EdgePointsFinder {</span>
+
+    /**
+     * Read details from a file and parse it into a char array.
+     *
+     * @param filename The name of the file to read.
+     * @return A 2D char array representing the parsed content.
+     */
+    public static char[][] getDetails(String filename) {
+
+        File f;
+<span class="nc" id="L19">        Scanner scan = null;</span>
+        try {
+<span class="nc" id="L21">            f = new File(filename);</span>
+<span class="nc" id="L22">            scan = new Scanner(f);</span>
+<span class="nc" id="L23">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L24">            System.err.println(&quot;Error with test file&quot;);</span>
+<span class="nc" id="L25">            System.exit(1);</span>
+<span class="nc" id="L26">        }</span>
+
+<span class="nc" id="L28">        char[][] content = new char[App.BOARD_WIDTH][App.BOARD_WIDTH];</span>
+
+<span class="nc" id="L30">        int row = 0;</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        while (scan.hasNextLine()) {</span>
+<span class="nc" id="L32">            String line = scan.nextLine();</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            for (int col = 0; col &lt; line.length(); col++) {</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">                if (line.charAt(col) == 'X') {</span>
+<span class="nc" id="L35">                    content[row][col] = 'X';</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                } else if (line.charAt(col) == 'S') {</span>
+<span class="nc" id="L37">                    content[row][col] = 'S';</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">                } else if (line.charAt(col) == 'W') {</span>
+<span class="nc" id="L39">                    content[row][col] = 'W';</span>
+                } else {
+<span class="nc" id="L41">                    content[row][col] = ' ';</span>
+                }
+            }
+<span class="nc" id="L44">            row++;</span>
+<span class="nc" id="L45">        }</span>
+<span class="nc" id="L46">        scan.close();</span>
+<span class="nc" id="L47">        return content;</span>
+    }
+
+    /**
+     * Find edge points in a grid of characters ('X' values) and return their positions.
+     *
+     * @param grid A 2D char array representing the grid.
+     * @return An ArrayList of int arrays with x and y coordinates of edge points.
+     */
+    public static ArrayList&lt;int[]&gt; findEdgePoints(char[][] grid) {
+<span class="nc" id="L57">        ArrayList&lt;int[]&gt; edgePoints = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L59" title="All 4 branches missed.">        if (grid.length == 0 || grid[0].length == 0) {</span>
+<span class="nc" id="L60">            return edgePoints;</span>
+        }
+
+<span class="nc" id="L63">        int numRows = grid.length;</span>
+<span class="nc" id="L64">        int numCols = grid[0].length;</span>
+
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        for (int col = 0; col &lt; numCols; col++) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (grid[0][col] == 'X') {</span>
+<span class="nc" id="L68">                int[] point = new int[2];</span>
+<span class="nc" id="L69">                point[0] = col;</span>
+<span class="nc" id="L70">                edgePoints.add(point);</span>
+            }
+        }
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        for (int col = 0; col &lt; numCols; col++) {</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            if (grid[numRows - 1][col] == 'X') {</span>
+<span class="nc" id="L76">                int[] point = new int[2];</span>
+<span class="nc" id="L77">                point[1] = numRows - 1;</span>
+<span class="nc" id="L78">                point[0] = col;</span>
+<span class="nc" id="L79">                edgePoints.add(point);</span>
+            }
+        }
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        for (int row = 1; row &lt; numRows - 1; row++) {</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (grid[row][0] == 'X') {</span>
+<span class="nc" id="L85">                int[] point = new int[2];</span>
+<span class="nc" id="L86">                point[1] = row;</span>
+<span class="nc" id="L87">                edgePoints.add(point);</span>
+            }
+        }
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        for (int row = 1; row &lt; numRows - 1; row++) {</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (grid[row][numCols - 1] == 'X') {</span>
+<span class="nc" id="L93">                int[] point = new int[2];</span>
+<span class="nc" id="L94">                point[1] = row;</span>
+<span class="nc" id="L95">                point[0] = numCols - 1;</span>
+<span class="nc" id="L96">                edgePoints.add(point);</span>
+            }
+        }
+
+<span class="nc" id="L100">        return edgePoints;</span>
+    }
+
+    /**
+     * Check if a specific position in the grid represents a grass tile (' ').
+     *
+     * @param filename The name of the file containing the grid details.
+     * @param posX The X position of the tile.
+     * @param posY The Y position of the tile.
+     * @return true if the tile is a grass tile, false otherwise.
+     */
+    public static boolean isGrassTile(String filename, int posX, int posY) {
+        try {
+<span class="nc" id="L113">            char type = getDetails(filename)[posY - 1][posX ];</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            return type == ' ';</span>
+<span class="nc" id="L115">        } catch (IndexOutOfBoundsException e) {</span>
+<span class="nc" id="L116">            return false;</span>
+        }
+    }
+
+    /**
+     * Calculate the hypotenuse length (Euclidean distance) between two points.
+     *
+     * @param x1 The X coordinate of the first point.
+     * @param x2 The X coordinate of the second point.
+     * @param y1 The Y coordinate of the first point.
+     * @param y2 The Y coordinate of the second point.
+     * @return The length of the hypotenuse between the points as an integer.
+     */
+    public static int getHypoLength(float x1, float x2, float y1, float y2) {
+<span class="nc" id="L130">        float xDiff = Math.abs(x2-x1);</span>
+<span class="nc" id="L131">        float yDiff = Math.abs(y2-y1);</span>
+
+<span class="nc" id="L133">        return (int) Math.hypot(xDiff, yDiff);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

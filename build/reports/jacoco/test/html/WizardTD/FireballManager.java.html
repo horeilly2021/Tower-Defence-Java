@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FireballManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">FireballManager.java</span></div><h1>FireballManager.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.data.JSONObject;
+
+import java.util.ArrayList;
+
+public class FireballManager {
+
+    private PApplet parent;
+    private PImage sprite;
+    private JSONObject json;
+    private ArrayList&lt;Fireball&gt; fireballs;
+    private int damage;
+    public static final float SPEED = 5f;
+
+<span class="nc" id="L18">    public FireballManager(PApplet parent, JSONObject json) {</span>
+<span class="nc" id="L19">        this.parent = parent;</span>
+<span class="nc" id="L20">        this.json = json;</span>
+<span class="nc" id="L21">        this.sprite = getSprite();</span>
+
+<span class="nc" id="L23">        this.fireballs = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L24">        this.damage = this.json.getInt(&quot;initial_tower_damage&quot;);</span>
+<span class="nc" id="L25">    }</span>
+
+    /**
+     * Get the image sprite for the tower's fireball projectile.
+     *
+     * @return The image sprite of the fireball.
+     */
+    private PImage getSprite() {
+<span class="nc" id="L33">        return this.parent.loadImage(&quot;src/main/resources/WizardTD/fireball.png&quot;);</span>
+    }
+
+    /**
+     * Create a new fireball projectile fired from the tower towards a monster.
+     *
+     * @param tower The tower firing the fireball.
+     * @param monster The target monster.
+     */
+    public void newFireball(Tower tower, Monster monster) {
+<span class="nc" id="L43">        int xDist = (int) Math.abs(tower.getX() - monster.getCurX());</span>
+<span class="nc" id="L44">        int yDist = (int) Math.abs(tower.getY() - monster.getCurY());</span>
+<span class="nc" id="L45">        int totalDist = xDist + yDist;</span>
+
+<span class="nc" id="L47">        float xPer = (float) xDist / totalDist;</span>
+
+<span class="nc" id="L49">        float velX = xPer * SPEED;</span>
+<span class="nc" id="L50">        float velY = SPEED - velX;</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (tower.getX() &gt; monster.getCurX()) {</span>
+<span class="nc" id="L53">            velX *= -1;</span>
+        }
+
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (tower.getY() &gt; monster.getCurY()) {</span>
+<span class="nc" id="L57">            velY *= -1;</span>
+        }
+
+<span class="nc" id="L60">        this.fireballs.add(new Fireball(this.json, tower.getX() + App.HALF_CELL, tower.getY() + App.HALF_CELL, velX, velY, this.sprite));</span>
+<span class="nc" id="L61">    }</span>
+
+    /**
+     * Update the state of fireball projectiles, including their movement and collision with monsters.
+     *
+     * @param monsters The list of active monsters in the game.
+     */
+    public void update(ArrayList&lt;Monster&gt; monsters) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        for (Fireball fireball : this.fireballs) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (!App.paused) fireball.move();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            if (monsterHit(fireball, monsters)) {</span>
+<span class="nc" id="L72">                fireball.setHit(true);</span>
+<span class="nc" id="L73">                fireball.setDmg(0);</span>
+            }
+<span class="nc" id="L75">        }</span>
+<span class="nc" id="L76">    }</span>
+
+    /**
+     * Check if a fireball has hit any monsters and apply damage if so.
+     *
+     * @param fireball The fireball projectile to check for hits.
+     * @param monsters The list of active monsters in the game.
+     * @return true if the fireball hits a monster, false otherwise.
+     */
+    private boolean monsterHit(Fireball fireball, ArrayList&lt;Monster&gt; monsters) {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        for (Monster monster : monsters) {</span>
+<span class="nc bnc" id="L87" title="All 4 branches missed.">            if (fireball.getPos().x &gt;= monster.getCurX() &amp;&amp; fireball.getPos().x &lt;= monster.getCurX() + monster.getSprite().width &amp;&amp;</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                    fireball.getPos().y &gt;= monster.getCurY() &amp;&amp; fireball.getPos().y &lt;= monster.getCurY() + monster.getSprite().height) {</span>
+<span class="nc" id="L89">                monster.damage(fireball.getDmg());</span>
+<span class="nc" id="L90">                return true;</span>
+            }
+<span class="nc" id="L92">        }</span>
+<span class="nc" id="L93">        return false;</span>
+    }
+
+    /**
+     * Draw the fireball projectiles on the screen and update their state.
+     *
+     * @param monsters The list of active monsters in the game.
+     */
+    public void draw(ArrayList&lt;Monster&gt; monsters) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        for (Fireball fireball : fireballs) {</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (!fireball.isHit()) this.parent.image(fireball.getProjectileType(), fireball.getPos().x, fireball.getPos().y);</span>
+<span class="nc" id="L104">        }</span>
+<span class="nc" id="L105">        update(monsters);</span>
+<span class="nc" id="L106">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

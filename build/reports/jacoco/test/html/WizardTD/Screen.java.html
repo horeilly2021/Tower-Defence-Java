@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Screen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">Screen.java</span></div><h1>Screen.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.io.*;
+
+public class Screen {
+    private final PApplet parent;
+    private String level;
+    private static final int ARGB = 2;
+
+    private int houseX;
+    private int houseY;
+
+<span class="nc" id="L20">    public Screen(PApplet parent, String level) {</span>
+<span class="nc" id="L21">        this.parent = parent;</span>
+<span class="nc" id="L22">        this.level = level;</span>
+<span class="nc" id="L23">    }</span>
+
+    /**
+     * Reads the content of a file and stores it in a 2D string array.
+     *
+     * @param level The path to the file to read.
+     * @return A 2D string array containing the content of the file.
+     * @throws FileNotFoundException If the specified file is not found.
+     */
+    public static String[][] readFile(String level) throws FileNotFoundException {
+
+<span class="nc" id="L34">        File display = new File(level);</span>
+<span class="nc" id="L35">        Scanner scan = new Scanner(display);</span>
+<span class="nc" id="L36">        String[][] content = new String[20][20];</span>
+
+<span class="nc" id="L38">        int row = 0;</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        while (scan.hasNextLine()) {</span>
+<span class="nc" id="L40">            String line = scan.nextLine();</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            for (int col = 0; col &lt; line.length(); col++) {</span>
+<span class="nc" id="L42">                content[row][col] = String.valueOf(line.charAt(col));</span>
+            }
+<span class="nc" id="L44">            row++;</span>
+<span class="nc" id="L45">        }</span>
+<span class="nc" id="L46">        scan.close();</span>
+
+<span class="nc" id="L48">        return content;</span>
+    }
+
+    /**
+     * Displays the game tiles based on the content of the level file.
+     */
+    public void display() {
+
+
+<span class="nc" id="L57">        String[][] content = new String[0][];</span>
+        try {
+<span class="nc" id="L59">            content = readFile(this.level);</span>
+<span class="nc" id="L60">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L61">            System.err.println(&quot;Level not found&quot;);</span>
+<span class="nc" id="L62">            System.exit(1);</span>
+<span class="nc" id="L63">        }</span>
+
+<span class="nc" id="L65">        int cellSize = 32;</span>
+<span class="nc" id="L66">        int numRows = content.length;</span>
+<span class="nc" id="L67">        int numCols = content[0].length;</span>
+
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        for (int i = 0; i &lt; numRows; i++) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            for (int j = 0; j &lt; numCols; j++) {</span>
+<span class="nc" id="L71">                int x = j * cellSize;</span>
+<span class="nc" id="L72">                int y = i * cellSize;</span>
+                try {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                    if (Objects.equals(content[i][j], &quot;S&quot;)) {</span>
+<span class="nc" id="L75">                        parent.image(App.shrub, x, y);</span>
+<span class="nc bnc" id="L76" title="All 10 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i + 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i - 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j + 1], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L77">                        parent.image(App.path3, x, y);</span>
+<span class="nc bnc" id="L78" title="All 8 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i + 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j + 1], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L79">                        parent.image(App.path2, x, y);</span>
+<span class="nc bnc" id="L80" title="All 8 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i + 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i - 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L81">                        parent.image(rotateImageByDegrees(App.path2, 90), x, y);</span>
+<span class="nc bnc" id="L82" title="All 8 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i - 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j + 1], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L83">                        parent.image(rotateImageByDegrees(App.path2, 180), x, y);</span>
+<span class="nc bnc" id="L84" title="All 6 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i + 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j + 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L85">                        parent.image(rotateImageByDegrees(App.path1, 270), x, y);</span>
+<span class="nc bnc" id="L86" title="All 6 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i + 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L87">                        parent.image(App.path1, x, y);</span>
+<span class="nc bnc" id="L88" title="All 6 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i - 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j - 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L89">                        parent.image(rotateImageByDegrees(App.path1, 90), x, y);</span>
+<span class="nc bnc" id="L90" title="All 6 branches missed.">                    }else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i - 1][j], &quot;X&quot;) &amp;&amp; Objects.equals(content[i][j + 1], &quot;X&quot;)) {</span>
+<span class="nc" id="L91">                        parent.image(rotateImageByDegrees(App.path1, 180), x, y);</span>
+<span class="nc bnc" id="L92" title="All 10 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;) &amp;&amp; (Objects.equals(content[i + 1][j], &quot;X&quot;) || Objects.equals(content[i + 1][j], &quot;W&quot;) || Objects.equals(content[i - 1][j], &quot;X&quot;) || Objects.equals(content[i - 1][j], &quot;W&quot;))) {</span>
+<span class="nc" id="L93">                        parent.image(rotateImageByDegrees(App.path0, 90), x, y);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">                    } else if (Objects.equals(content[i][j], &quot;X&quot;)) {</span>
+<span class="nc" id="L95">                        parent.image(App.path0, x, y);</span>
+                    } else {
+<span class="nc" id="L97">                        parent.image(App.grass, x, y);</span>
+                    }
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">                    if (Objects.equals(content[i][j], &quot;W&quot;)) {</span>
+<span class="nc" id="L101">                        this.houseX = x - ( App.BOARD_WIDTH / 2);</span>
+<span class="nc" id="L102">                        this.houseY = y - ( App.BOARD_WIDTH / 2);</span>
+                    }
+<span class="nc" id="L104">                } catch (ArrayIndexOutOfBoundsException e) {</span>
+<span class="nc" id="L105">                    parent.image(rotateImageByDegrees(App.path0, 90), x, y);</span>
+<span class="nc" id="L106">                }</span>
+            }
+        }
+<span class="nc" id="L109">        parent.image(App.wizard_house, this.houseX, this.houseY);</span>
+<span class="nc" id="L110">    }</span>
+
+    /**
+     * Source: https://stackoverflow.com/questions/37758061/rotate-a-buffered-image-in-java
+     * @param pimg The image to be rotated
+     * @param angle between 0 and 360 degrees
+     * @return the new rotated image
+     */
+    public PImage rotateImageByDegrees(PImage pimg, double angle) {
+<span class="nc" id="L119">        BufferedImage img = (BufferedImage) pimg.getNative();</span>
+<span class="nc" id="L120">        double rads = Math.toRadians(angle);</span>
+<span class="nc" id="L121">        double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));</span>
+<span class="nc" id="L122">        int w = img.getWidth();</span>
+<span class="nc" id="L123">        int h = img.getHeight();</span>
+<span class="nc" id="L124">        int newWidth = (int) Math.floor(w * cos + h * sin);</span>
+<span class="nc" id="L125">        int newHeight = (int) Math.floor(h * cos + w * sin);</span>
+
+<span class="nc" id="L127">        PImage result = this.parent.createImage(newWidth, newHeight, ARGB);</span>
+//        BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+<span class="nc" id="L129">        BufferedImage rotated = (BufferedImage) result.getNative();</span>
+<span class="nc" id="L130">        Graphics2D g2d = rotated.createGraphics();</span>
+<span class="nc" id="L131">        AffineTransform at = new AffineTransform();</span>
+<span class="nc" id="L132">        at.translate((newWidth - w) / 2, (newHeight - h) / 2);</span>
+
+<span class="nc" id="L134">        int x = w / 2;</span>
+<span class="nc" id="L135">        int y = h / 2;</span>
+
+<span class="nc" id="L137">        at.rotate(rads, x, y);</span>
+<span class="nc" id="L138">        g2d.setTransform(at);</span>
+<span class="nc" id="L139">        g2d.drawImage(img, 0, 0, null);</span>
+<span class="nc" id="L140">        g2d.dispose();</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        for (int i = 0; i &lt; newWidth; i++) {</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">            for (int j = 0; j &lt; newHeight; j++) {</span>
+<span class="nc" id="L143">                result.set(i, j, rotated.getRGB(i, j));</span>
+            }
+        }
+
+<span class="nc" id="L147">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

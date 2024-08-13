@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">assingment</a> &gt; <a href="index.source.html" class="el_package">WizardTD</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package WizardTD;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.data.JSONObject;
+import processing.event.MouseEvent;
+
+import java.util.*;
+
+public class App extends PApplet {
+
+    public static final int CELLSIZE = 32;
+    public static final int SIDEBAR = 120;
+    public static final int TOPBAR = 40;
+    public static final int BOARD_WIDTH = 20;
+    public static final int HALF_CELL = 16;
+<span class="nc" id="L17">    public static int WIDTH = CELLSIZE*BOARD_WIDTH+SIDEBAR;</span>
+<span class="nc" id="L18">    public static int HEIGHT = BOARD_WIDTH*CELLSIZE+TOPBAR;</span>
+    public static final int BARWIDTH = 256;
+    public static final int BARHEIGHT = 16;
+    public static final int FPS = 60;
+    public static final int THICK = 2;
+    public static final int THIN = 1;
+    public static final int BLACK = 0;
+    public String configPath;
+<span class="nc" id="L26">    public Random random = new Random();</span>
+    private String level;
+    private JSONObject json;
+    private WaveDisplay waves;
+    private Screen screen; // test
+    public static PImage beetle;
+    public static PImage fireball;
+    public static PImage grass;
+    public static PImage gremlin;
+    public static PImage gremlin1;
+    public static PImage gremlin2;
+    public static PImage gremlin3;
+    public static PImage gremlin4;
+    public static PImage gremlin5;
+    public static PImage path0;
+    public static PImage path1;
+    public static PImage path2;
+    public static PImage path3;
+    public static PImage shrub;
+    public static PImage tower0;
+    public static PImage tower1;
+    public static PImage tower2;
+    public static PImage wizard_house;
+    public static PImage worm;
+    public ButtonManager buttonManager;
+    public ArrayList&lt;MyButton&gt; buttons;
+    public int timer;
+    public static boolean paused;
+    public static boolean fast;
+    public TowerManager towerManager;
+    public Tower selectedTower;
+    public Mana mana;
+    public FireballManager fireballManager;
+    public int counter;
+    public int towerCost;
+    public int currentMana;
+    public int speed;
+<span class="nc" id="L63">    public boolean gameOver = false;</span>
+
+<span class="nc" id="L65">     public App() {</span>
+<span class="nc" id="L66">         this.configPath = &quot;config.json&quot;;</span>
+<span class="nc" id="L67">     }</span>
+
+    /**
+     * Initialise the setting of the window size.
+     */
+	@Override
+    public void settings() {
+<span class="nc" id="L74">        size(WIDTH, HEIGHT);</span>
+<span class="nc" id="L75">    }</span>
+
+    /**
+     * Loads all images into the game
+     */
+    public void loadImgs() {
+<span class="nc" id="L81">        beetle = loadImage(&quot;src/main/resources/WizardTD/beetle.png&quot;);</span>
+<span class="nc" id="L82">        fireball = loadImage(&quot;src/main/resources/WizardTD/fireball.png&quot;);</span>
+<span class="nc" id="L83">        grass = loadImage(&quot;src/main/resources/WizardTD/grass.png&quot;);</span>
+<span class="nc" id="L84">        gremlin = loadImage(&quot;src/main/resources/WizardTD/gremlin.png&quot;);</span>
+<span class="nc" id="L85">        gremlin1 = loadImage(&quot;src/main/resources/WizardTD/gremlin1.png&quot;);</span>
+<span class="nc" id="L86">        gremlin2 = loadImage(&quot;src/main/resources/WizardTD/gremlin2.png&quot;);</span>
+<span class="nc" id="L87">        gremlin3 = loadImage(&quot;src/main/resources/WizardTD/gremlin3.png&quot;);</span>
+<span class="nc" id="L88">        gremlin4 = loadImage(&quot;src/main/resources/WizardTD/gremlin4.png&quot;);</span>
+<span class="nc" id="L89">        gremlin5 = loadImage(&quot;src/main/resources/WizardTD/gremlin5.png&quot;);</span>
+<span class="nc" id="L90">        path0 = loadImage(&quot;src/main/resources/WizardTD/path0.png&quot;);</span>
+<span class="nc" id="L91">        path1 = loadImage(&quot;src/main/resources/WizardTD/path1.png&quot;);</span>
+<span class="nc" id="L92">        path2 = loadImage(&quot;src/main/resources/WizardTD/path2.png&quot;);</span>
+<span class="nc" id="L93">        path3 = loadImage(&quot;src/main/resources/WizardTD/path3.png&quot;);</span>
+<span class="nc" id="L94">        shrub = loadImage(&quot;src/main/resources/WizardTD/shrub.png&quot;);</span>
+<span class="nc" id="L95">        tower0 = loadImage(&quot;src/main/resources/WizardTD/tower0.png&quot;);</span>
+<span class="nc" id="L96">        tower1 = loadImage(&quot;src/main/resources/WizardTD/tower1.png&quot;);</span>
+<span class="nc" id="L97">        tower2 = loadImage(&quot;src/main/resources/WizardTD/tower2.png&quot;);</span>
+<span class="nc" id="L98">        wizard_house = loadImage(&quot;src/main/resources/WizardTD/wizard_house.png&quot;);</span>
+<span class="nc" id="L99">        worm = loadImage(&quot;src/main/resources/WizardTD/worm.png&quot;);</span>
+<span class="nc" id="L100">    }</span>
+
+    /**
+     * Load all resources such as images. Initialise the elements such as the player, enemies and map elements.
+     */
+	@Override
+    public void setup() {
+<span class="nc" id="L107">        frameRate(FPS);</span>
+
+<span class="nc" id="L109">        this.json = new JsonFileReader(this).readJsonFile(this.configPath);</span>
+<span class="nc" id="L110">        this.level = this.json.getString(&quot;layout&quot;);</span>
+
+<span class="nc" id="L112">        this.screen = new Screen(this, level);</span>
+<span class="nc" id="L113">        this.waves = new WaveDisplay(this, this.json);</span>
+<span class="nc" id="L114">        this.buttonManager = new ButtonManager(this);</span>
+<span class="nc" id="L115">        this.towerManager = new TowerManager(this, this.json);</span>
+<span class="nc" id="L116">        this.mana = new Mana(this);</span>
+<span class="nc" id="L117">        this.fireballManager = new FireballManager(this, this.json);</span>
+
+<span class="nc" id="L119">        this.towerCost = this.json.getInt(&quot;tower_cost&quot;);</span>
+<span class="nc" id="L120">        this.buttons = buttonManager.getButtons();</span>
+<span class="nc" id="L121">        this.currentMana = this.mana.getCurrentMana();</span>
+<span class="nc" id="L122">        this.timer = 1;</span>
+<span class="nc" id="L123">        this.counter = 0;</span>
+<span class="nc" id="L124">        this.speed = 1;</span>
+
+<span class="nc" id="L126">        paused = false;</span>
+<span class="nc" id="L127">        fast = false;</span>
+
+<span class="nc" id="L129">        loadImgs();</span>
+<span class="nc" id="L130">    }</span>
+
+    /**
+     * Receive key pressed signal from the keyboard.
+     */
+	@Override
+    public void keyPressed(){
+
+<span class="nc" id="L138">        char lowerKey = Character.toLowerCase(key);</span>
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (lowerKey == 'p') {</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            paused = !paused;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        } else if (lowerKey == 't') {</span>
+<span class="nc" id="L143">            selectedTower = new Tower(this, 0, 0, &quot;tower0&quot;);</span>
+<span class="nc" id="L144">            setSelectedTower(selectedTower);</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        } else if (lowerKey == 'f') {</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            fast = !fast;</span>
+        }
+
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        for (MyButton button : this.buttons) {</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (lowerKey == button.getKey()) {</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                button.setMousePressed(!button.isMousePressed());</span>
+<span class="nc bnc" id="L152" title="All 4 branches missed.">                if (button.getKey() == 't' &amp;&amp; !button.isMousePressed()) {</span>
+<span class="nc" id="L153">                    selectedTower = null;</span>
+                }
+            }
+<span class="nc" id="L156">        }</span>
+        
+<span class="nc" id="L158">    }</span>
+
+    /**
+     * Receive key released signal from the keyboard.
+     */
+	@Override
+    public void keyReleased(){
+
+<span class="nc" id="L166">    }</span>
+
+    public void setSelectedTower(Tower selectedTower) {
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (this.towerCost &lt;= this.currentMana) {</span>
+<span class="nc" id="L170">            this.selectedTower = selectedTower;</span>
+        }
+<span class="nc" id="L172">    }</span>
+
+    public void drawSelectedTower() {
+<span class="nc bnc" id="L175" title="All 2 branches missed.">        if (selectedTower != null) {</span>
+<span class="nc" id="L176">            image(selectedTower.getSprite(), mouseX - HALF_CELL, mouseY - TOPBAR - HALF_CELL);</span>
+<span class="nc" id="L177">            selectedTower.drawRange(mouseX, mouseY, TOPBAR);</span>
+        }
+<span class="nc" id="L179">    }</span>
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (e.getButton() == 37) {</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            for (MyButton button : this.buttons) {</span>
+<span class="nc bnc" id="L185" title="All 4 branches missed.">                if ((button.getX() &lt; e.getX()) &amp;&amp; (e.getX() &lt; button.getX() + button.getWidth())) {</span>
+<span class="nc bnc" id="L186" title="All 4 branches missed.">                    if ((button.getY() &lt; e.getY()) &amp;&amp; (e.getY() &lt; button.getHeight() + button.getY())) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                        button.setMousePressed(!button.isMousePressed());</span>
+
+<span class="nc bnc" id="L189" title="All 4 branches missed.">                        if (Objects.equals(button.getText(), &quot;P&quot;)) paused = !paused;</span>
+<span class="nc bnc" id="L190" title="All 4 branches missed.">                        if (Objects.equals(button.getText(), &quot;FF&quot;)) fast = !fast;</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">                        if (Objects.equals(button.getText(), &quot;T&quot;)) {</span>
+<span class="nc" id="L192">                            selectedTower = new Tower(this, 0, 0, &quot;tower0&quot;);</span>
+<span class="nc" id="L193">                            setSelectedTower(selectedTower);</span>
+                        }
+                    }
+                }
+<span class="nc" id="L197">            }</span>
+
+<span class="nc bnc" id="L199" title="All 2 branches missed.">            for (Tower tower : this.towerManager.getTowers()) {</span>
+
+<span class="nc bnc" id="L201" title="All 4 branches missed.">                if (mouseX &gt;= tower.getX() &amp;&amp; mouseX &lt;= tower.getX() + tower.getSprite().width &amp;&amp;</span>
+<span class="nc bnc" id="L202" title="All 4 branches missed.">                        mouseY &gt;= tower.getY() + tower.getSprite().height &amp;&amp; mouseY &lt;= tower.getY() + 2 * tower.getSprite().height) {</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">                    tower.setMousePressed(!tower.isMousePressed());</span>
+                }
+<span class="nc" id="L205">            }</span>
+        }
+<span class="nc" id="L207">    }</span>
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+<span class="nc" id="L212">    }</span>
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (selectedTower != null) {</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">            if (this.towerCost &gt; this.currentMana) {</span>
+<span class="nc" id="L218">                selectedTower = null;</span>
+            }
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            if (EdgePointsFinder.isGrassTile(this.level, (mouseX / CELLSIZE), (mouseY / CELLSIZE))) {</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">                for (Tower tower : this.towerManager.getTowers()) {</span>
+<span class="nc bnc" id="L222" title="All 4 branches missed.">                    if (mouseX &gt;= tower.getX() &amp;&amp; mouseX &lt;= tower.getX() + tower.getSprite().width &amp;&amp;</span>
+<span class="nc bnc" id="L223" title="All 4 branches missed.">                            mouseY &gt;= tower.getY() + tower.getSprite().height &amp;&amp; mouseY &lt;= tower.getY() + 2 * tower.getSprite().height) {</span>
+<span class="nc" id="L224">                        System.out.println(&quot;CANNOT PLACE HERE&quot;);</span>
+<span class="nc" id="L225">                        selectedTower = null;</span>
+                    }
+<span class="nc" id="L227">                }</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                if (selectedTower != null) {</span>
+<span class="nc" id="L229">                    towerManager.addTower(selectedTower, mouseX - HALF_CELL, mouseY - TOPBAR - HALF_CELL);</span>
+<span class="nc" id="L230">                    this.mana.decreaseMana(this.towerCost);</span>
+                }
+            }
+        }
+<span class="nc" id="L234">        selectedTower = null;</span>
+<span class="nc" id="L235">        this.buttons.get(2).setMousePressed(false);</span>
+<span class="nc" id="L236">    }</span>
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        for (MyButton button : buttons) {</span>
+<span class="nc bnc" id="L241" title="All 4 branches missed.">            if (mouseX &gt;= button.getX() &amp;&amp; mouseX &lt;= button.getX() + button.getWidth() &amp;&amp;</span>
+<span class="nc bnc" id="L242" title="All 4 branches missed.">                    mouseY &gt;= button.getY() &amp;&amp; mouseY &lt;= button.getY() + button.getHeight()) {</span>
+<span class="nc" id="L243">                 button.setMouseOver(true);</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">                if (button.getKey() == 't') {</span>
+<span class="nc" id="L245">                    towerDesc(button, &quot;cost&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L248">                button.setMouseOver(false);</span>
+            }
+<span class="nc" id="L250">        }</span>
+
+<span class="nc bnc" id="L252" title="All 2 branches missed.">        for (Tower tower : this.towerManager.getTowers()) {</span>
+
+<span class="nc bnc" id="L254" title="All 4 branches missed.">            if (mouseX &gt;= tower.getX() &amp;&amp; mouseX &lt;= tower.getX() + tower.getSprite().width &amp;&amp;</span>
+<span class="nc bnc" id="L255" title="All 4 branches missed.">                    mouseY &gt;= tower.getY() + tower.getSprite().height &amp;&amp; mouseY &lt;= tower.getY() + 2 * tower.getSprite().height) {</span>
+<span class="nc" id="L256">                tower.setMouseOver(true);</span>
+            } else {
+<span class="nc" id="L258">                tower.setMouseOver(false);</span>
+            }
+<span class="nc" id="L260">        }</span>
+<span class="nc" id="L261">    }</span>
+
+    /*
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+    */
+
+    public void towerDesc(MyButton button, String text) {
+<span class="nc" id="L271">        fill(255);</span>
+<span class="nc" id="L272">        rect(button.getX() - 80, button.getY(), 65, 20);</span>
+<span class="nc" id="L273">        fill(0);</span>
+<span class="nc" id="L274">        textSize(12);</span>
+<span class="nc" id="L275">        text(text + &quot;: &quot; + this.towerCost, button.getX() - 48, button.getY() + 8);</span>
+<span class="nc" id="L276">    }</span>
+
+    public void shootMonster(Tower tower, Monster monster) {
+<span class="nc" id="L279">        this.fireballManager.newFireball(tower, monster);</span>
+<span class="nc" id="L280">    }</span>
+
+    /**
+     * If a monster is in range of a tower, shoot the monster
+     *
+     */
+    public void attackEnemy(ArrayList&lt;Monster&gt; monsters, ArrayList&lt;Tower&gt; towers) {
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        if (this.counter == FPS) {</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            for (Tower tower : towers) {</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">                for (Monster monster : monsters) {</span>
+<span class="nc bnc" id="L290" title="All 4 branches missed.">                    if (this.towerManager.isMonsterInRange(tower, monster) &amp;&amp; monster.isAlive()) {</span>
+<span class="nc" id="L291">                        shootMonster(tower, monster);</span>
+<span class="nc" id="L292">                         break;</span>
+                    }
+<span class="nc" id="L294">                }</span>
+<span class="nc" id="L295">            }</span>
+<span class="nc" id="L296">            this.counter = 0;</span>
+        }
+<span class="nc" id="L298">        this.counter++;</span>
+<span class="nc" id="L299">    }</span>
+
+    /**
+     * Increase the current mana for each monster that has been killed
+     */
+    public void collectMana() {
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        for (Monster monster : this.waves.getMonsters()) {</span>
+<span class="nc bnc" id="L306" title="All 4 branches missed.">            if (monster.isKilled() &amp;&amp; !monster.hasCollectedMana()) {</span>
+<span class="nc" id="L307">                monster.setCollectedMana(true);</span>
+<span class="nc" id="L308">                this.mana.increaseMana(monster.getManaGainedOnKill());</span>
+            }
+<span class="nc" id="L310">        }</span>
+<span class="nc" id="L311">    }</span>
+
+    /**
+     * Reduce the current mana for each monster if the monster has reached the wizard house
+     */
+    public void loseMana() {
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        for (Monster monster : this.waves.getMonsters()) {</span>
+<span class="nc bnc" id="L318" title="All 4 branches missed.">            if (monster.hasReached() &amp;&amp; !monster.hasCollectedMana()) {</span>
+<span class="nc" id="L319">                monster.setCollectedMana(true);</span>
+<span class="nc" id="L320">                this.mana.decreaseMana(monster.getManaGainedOnKill());</span>
+            }
+<span class="nc" id="L322">        }</span>
+<span class="nc" id="L323">    }</span>
+
+    /**
+     * Draw all elements in the game by current frame.
+     */
+	@Override
+    public void draw() {
+
+<span class="nc" id="L331">        background(177, 165, 134);  // Brown color</span>
+<span class="nc" id="L332">        this.buttonManager.draw();</span>
+
+<span class="nc" id="L334">        translate(0, TOPBAR);</span>
+<span class="nc" id="L335">        this.screen.display();</span>
+<span class="nc" id="L336">        this.waves.display();</span>
+<span class="nc" id="L337">        this.towerManager.draw();</span>
+<span class="nc" id="L338">        drawSelectedTower();</span>
+<span class="nc" id="L339">        this.fireballManager.draw(this.waves.getMonsters());</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (!paused) attackEnemy(this.waves.getMonsters(), this.towerManager.getTowers());</span>
+<span class="nc" id="L341">        this.currentMana = this.mana.getCurrentMana();</span>
+<span class="nc" id="L342">        collectMana();</span>
+<span class="nc" id="L343">        loseMana();</span>
+
+
+<span class="nc bnc" id="L346" title="All 2 branches missed.">        if (!paused) {</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            if (fast) this.speed = 2;</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">            if (!fast) this.speed = 1;</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">            if (this.timer * this.speed % FPS == 0) {</span>
+<span class="nc" id="L350">                this.mana.increaseMana(this.mana.getManaPerSecond());</span>
+            }
+<span class="nc" id="L352">            this.timer++;</span>
+        }
+<span class="nc" id="L354">        translate(0, -TOPBAR);</span>
+
+<span class="nc" id="L356">        textSize(24); // Set the text size</span>
+<span class="nc" id="L357">        fill(BLACK); // Set the text color (black)</span>
+<span class="nc" id="L358">        text(&quot;Wave &quot; + this.waves.getWaveCounter() + &quot; starts in &quot; + (int) (this.waves.getTestCounter() / FPS), 114, 20);</span>
+
+<span class="nc" id="L360">        textSize(24);</span>
+<span class="nc" id="L361">        fill(BLACK);</span>
+<span class="nc" id="L362">        text(&quot;MANA:&quot;, 416, 20);</span>
+<span class="nc" id="L363">        drawMana();</span>
+
+<span class="nc bnc" id="L365" title="All 4 branches missed.">        if (this.currentMana &lt; 0 &amp;&amp; !gameOver) {</span>
+<span class="nc" id="L366">            System.out.println(&quot;GAME OVER&quot;);</span>
+<span class="nc" id="L367">            paused = true;</span>
+<span class="nc" id="L368">            gameOver = true;</span>
+        }
+<span class="nc" id="L370">    }</span>
+
+    /**
+     * Draw mana bar in the top right corner representing the players current vs max mana
+     */
+    public void drawMana() {
+<span class="nc" id="L376">        strokeWeight(THICK);</span>
+<span class="nc" id="L377">        fill(255, 255, 255);</span>
+<span class="nc" id="L378">        rect(464, 15, BARWIDTH, BARHEIGHT);</span>
+
+<span class="nc" id="L380">        float mana = map(this.mana.getMaxMana(), 0, this.mana.getMaxMana(), 0, this.currentMana);</span>
+<span class="nc" id="L381">        float percentageBar = (mana / this.mana.getMaxMana()) * BARWIDTH;</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">        if (percentageBar &gt;= BARWIDTH) percentageBar = BARWIDTH;</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">        if (percentageBar &lt;= 0) {</span>
+<span class="nc" id="L384">            percentageBar = 0;</span>
+        }
+
+<span class="nc" id="L387">        fill(97, 211, 217);</span>
+<span class="nc" id="L388">        rect(464, 15, percentageBar, BARHEIGHT);</span>
+<span class="nc" id="L389">        strokeWeight(THIN);</span>
+<span class="nc" id="L390">        int displayMana = this.currentMana;</span>
+<span class="nc bnc" id="L391" title="All 2 branches missed.">        if (displayMana &lt;= 0) displayMana = 0;</span>
+
+<span class="nc" id="L393">        fill(BLACK);</span>
+<span class="nc" id="L394">        textSize(15);</span>
+<span class="nc" id="L395">        float textX = 480 + (float) BARWIDTH / 2 - textWidth(&quot;mana&quot;) / 2;</span>
+<span class="nc" id="L396">        float textY = 6 + (float) BARHEIGHT / 2 + textAscent() / 2;</span>
+<span class="nc" id="L397">        text( displayMana + &quot;/&quot; + this.mana.getMaxMana(), textX, textY);</span>
+<span class="nc" id="L398">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L401">        System.out.println(&quot;Starting game...&quot;);</span>
+<span class="nc" id="L402">        PApplet.main(&quot;WizardTD.App&quot;);</span>
+<span class="nc" id="L403">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

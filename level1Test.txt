@@ -1,0 +1,20 @@
+SS             SS  S
+  S S S  S S  S
+        S   S  SS S
+11111         S
+  S 1   S  S      S
+  SX1111111111111
+  S X X         1  S
+    S S        X1 S
+         W1111111 S
+   S   S          SS
+     S S        S S
+ S   S    SS    S S
+  SSS    S   S
+ S   S          SS
+ S S S  S  S  SS SS
+ S   S         S SS
+ SSSSS     S   S  S
+ SS SS  S      SSSS
+      S    S   S  SS
+             S
